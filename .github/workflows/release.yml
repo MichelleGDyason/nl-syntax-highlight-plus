@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: nl-syntax-highlighting
+  PLUGIN_NAME: nl-syntax-highlight-plus
 
 jobs:
   build:

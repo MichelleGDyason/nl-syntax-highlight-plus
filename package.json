@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-nl-syntax-highlight-plus",
 	"version": "0.5.0",
-	"description": "Highlight adjectives, nouns, adverbs, verbs, and conjunctions in the editor",
+	"description": "Highlight parts of speech and sentence roles, with playful interpretive modes inspired by philosophy.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

@@ -3,7 +3,7 @@
 	"name": "Natural Language Syntax Highlight Plus",
 	"version": "0.5.0",
 	"minAppVersion": "0.15.0",
-	"description": "Fork of NL Syntax Highlighting with added highlighting for articles & pronouns",
+	"description": "Highlight parts of speech and sentence roles, with playful interpretive modes inspired by philosophy.",
 	"author": "MichelleGDyason",
 	"authorUrl": "https://github.com/MichelleGDyason",
 	"fundingUrl": "https://buymeacoffee.com/michellegdyason",

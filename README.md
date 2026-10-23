@@ -2,7 +2,27 @@
 
 **Fork of:** [nl-syntax-highlighting](https://github.com/artisticat1/nl-syntax-highlighting)
 
-This plugin is a fork by MichelleGDyason that extends the original **Natural Language Syntax Highlighting** plugin for Obsidian.  
+Highlight parts of speech and sentence roles in your notes, with optional playful interpretive modes inspired by philosophy. Natural Language Syntax Highlight Plus helps you notice how your writing works through coloured words and subject, object, and predicate markers.
+
+This plugin is a fork by MichelleGDyason that extends the original **Natural Language Syntax Highlighting** plugin for Obsidian.
+
+## Interpretive modes
+
+Choose an **Interpretive mode** in the plugin settings. The descriptions beneath each grammatical element change to reflect the selected lens:
+
+- **Grammar:** Familiar grammatical descriptions, such as nouns for people, places, things, and ideas, and verbs for actions, processes, or states of being.
+- **Structuralism:** Looks at language through signs, differences, and relations. Nouns become conceptual units, verbs link terms, and adjectives mark differences.
+- **Deleuzian:** Plays with assemblages, becoming, intensity, and events. Nouns suggest provisional assemblages, verbs suggest movement or transformation, and adjectives suggest intensities.
+- **Foucaultian:** Plays with discourse, power, and norms. Nouns suggest discursive objects, verbs suggest regulation, adjectives suggest norms, and pronouns suggest subject positions.
+- **Geontology:** Plays with entities, endurance, vitality, and governance. Nouns suggest forms of persistence, verbs suggest endurance or transition, and adjectives suggest qualities of liveliness.
+
+The philosophical modes are here for a bit of fun: an invitation to experiment with different ways of reading your notes. They are loose, playful interpretations built on grammatical highlighting, not authoritative philosophical analyses. Subject and object markers retain their grammatical meaning across modes. Interpretive modes are separate from the visual themes described below.
+
+**Requests for other interpretive modes are welcome!** [Open an issue](https://github.com/MichelleGDyason/nl-syntax-highlight-plus/issues/new) with your idea and, if possible, examples of how you would describe different parts of speech through that lens.
+
+## Bugs and feedback
+
+If you find a bug, please [raise an issue on GitHub](https://github.com/MichelleGDyason/nl-syntax-highlight-plus/issues). Highlighting is automatic and can sometimes misclassify words or sentence roles. A short example sentence, what you expected, and what actually happened will help reproduce the problem. For colour or display issues, please include your Obsidian theme, the plugin's visual theme and interpretive mode, and a screenshot if possible.
 
 ## Changes in this fork
 - Added highlighting for **articles** (`a`, `an`, `the`)  

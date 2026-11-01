@@ -1,5 +1,5 @@
-import { Plugin } from 'obsidian';
-import { NLSyntaxHighlightViewPlugin } from 'syntaxHighlight';
+import { Plugin, Notice } from 'obsidian';
+import { createSyntaxHighlightExtension } from 'syntaxHighlight';
 import { NLSyntaxHighlightPluginSettings, DEFAULT_SETTINGS, NLSyntaxHighlightSettingTab, normalizeTheme, normalizeLegacyColors } from 'settings';
 import { Extension } from '@codemirror/state';
 
@@ -8,44 +8,64 @@ export default class NLSyntaxHighlightPlugin extends Plugin {
 	settings: NLSyntaxHighlightPluginSettings;
 	extensions: Extension[];
 	wordsToOverrideDict: {[word: string]: string};
-	styleEl: Element;
+	private disposed = false;
 
 	applyTheme() {
 		const themeClass = `nlsh-theme-${this.settings.theme}`;
-	  
+
 		document.body.classList.remove(
-		  "nlsh-theme-minimal",
-		  "nlsh-theme-high-contrast",
-		  "nlsh-theme-teaching",
-		  "nlsh-theme-deleuzian"
+			"nlsh-theme-minimal",
+			"nlsh-theme-high-contrast",
+			"nlsh-theme-teaching",
+			"nlsh-theme-deleuzian"
 		);
-	  
+
 		document.body.classList.add(themeClass);
-	  }
+	}
 
 
-	async onload() {
+	onload(): void {
+		void this.initialize().catch((error: unknown) => {
+			console.error('Syntax Highlight Plus failed to load', error);
+			new Notice('Syntax Highlight Plus could not load. See the console for details.');
+		});
+	}
+
+	private async initialize() {
 		await this.loadSettings();
+		if (this.disposed) return;
 		this.addSettingTab(new NLSyntaxHighlightSettingTab(this.app, this));
 		this.applyTheme();
 
 		this.loadWordsToOverrideDict();
 
-		this.extensions = this.settings.enabled ? [NLSyntaxHighlightViewPlugin.extension] : [];
+		this.extensions = this.settings.enabled ? [createSyntaxHighlightExtension(this)] : [];
 		this.registerEditorExtension(this.extensions);
+		this.registerEvent(this.app.metadataCache.on('changed', () => {
+			if (this.settings.classToApplyHighlightingTo.trim()) this.reloadEditorExtensions();
+		}));
 		
-		this.styleEl = document.head.createEl("style");
-		this.reloadStyle();
+
 
 		this.addCommands();
 	}
 
 	onunload() {
-		this.styleEl.remove();
+		this.disposed = true;
+		document.body.classList.remove("nlsh-theme-minimal", "nlsh-theme-high-contrast", "nlsh-theme-teaching");
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const saved: unknown = await this.loadData();
+		this.settings = { ...DEFAULT_SETTINGS };
+		if (saved && typeof saved === "object") {
+			for (const key of Object.keys(DEFAULT_SETTINGS) as (keyof NLSyntaxHighlightPluginSettings)[]) {
+				const value: unknown = (saved as Record<string, unknown>)[key];
+				if (typeof value === typeof DEFAULT_SETTINGS[key]) {
+					Object.assign(this.settings, { [key]: value });
+				}
+			}
+		}
 		this.settings.theme = normalizeTheme(this.settings.theme);
 		normalizeLegacyColors(this.settings);
 		await this.saveData(this.settings);
@@ -69,61 +89,12 @@ export default class NLSyntaxHighlightPlugin extends Plugin {
 
 	updateExtensionEnabled(enabled: boolean) {
 		if (enabled) {
-			this.extensions.push(NLSyntaxHighlightViewPlugin.extension);
+			this.extensions.push(createSyntaxHighlightExtension(this));
 		} else {
 			this.extensions.pop();
 		}
 
 		this.app.workspace.updateOptions(); 
-	}
-
-	convertSettingsToStyle(settings: NLSyntaxHighlightPluginSettings) {
-		if (settings.classToApplyHighlightingTo.length === 0) {
-			return "";
-		}
-
-		let style = "";
-
-		// Map each POS to its settings property names
-		const posList = [
-			{ key: "adjective", enabled: settings.adjectiveEnabled, color: settings.adjectiveColor },
-			{ key: "noun", enabled: settings.nounEnabled, color: settings.nounColor },
-			{ key: "adverb", enabled: settings.adverbEnabled, color: settings.adverbColor },
-			{ key: "verb", enabled: settings.verbEnabled, color: settings.verbColor },
-			{ key: "conjunction", enabled: settings.conjunctionEnabled, color: settings.conjunctionColor },
-			{ key: "article", enabled: settings.articleEnabled, color: settings.articleColor },
-			{ key: "pronoun", enabled: settings.pronounEnabled, color: settings.pronounColor },
-			{ key: "preposition", enabled: settings.prepositionEnabled, color: settings.prepositionColor },
-			{ key: "predicate", enabled: settings.predicateEnabled, color: settings.predicateColor },
-			{ key: "subject", enabled: settings.subjectEnabled, color: settings.subjectColor },
-			{ key: "object", enabled: settings.objectEnabled, color: settings.objectColor }
-		];
-
-		const classPrefix = settings.classToApplyHighlightingTo.length > 0
-			? `.${settings.classToApplyHighlightingTo} `
-			: "";
-
-		for (const pos of posList) {
-			if (!pos.enabled) continue;
-			// Predicate is a separate underline, while subject/object stay additive role markers.
-			if (pos.key === "predicate") {
-				style += `${classPrefix}.predicate { color: inherit; background-image: linear-gradient(${pos.color}, ${pos.color}); background-repeat: no-repeat; background-size: 100% 2px; background-position: 0 100%; }\n`;
-			} else if (pos.key === "subject") {
-				style += `${classPrefix}.subject { color: inherit; background-image: linear-gradient(${pos.color}, ${pos.color}); background-repeat: no-repeat; background-size: 100% 2px; background-position: 0 calc(100% - 3px); }\n`;
-			} else if (pos.key === "object") {
-				style += `${classPrefix}.object { color: inherit; background-image: linear-gradient(${pos.color}, ${pos.color}); background-repeat: no-repeat; background-size: 100% 2px; background-position: 0 calc(100% - 3px); }\n`;
-			} else if (pos.key === "adjective") {
-				style += `${classPrefix}.adjective { color: ${pos.color}; }\n`;
-			} else {
-				style += `${classPrefix}.${pos.key} { color: ${pos.color}; }\n`;
-			}
-		}
-
-		return style;
-	}
-
-	reloadStyle() {
-		this.styleEl.textContent = this.convertSettingsToStyle(this.settings);
 	}
 
 	loadWordsToOverrideDict() {
@@ -144,7 +115,7 @@ export default class NLSyntaxHighlightPlugin extends Plugin {
 		if (this.settings.enabled) {
 			this.extensions.pop();
 			this.app.workspace.updateOptions();
-			this.extensions.push(NLSyntaxHighlightViewPlugin.extension);
+			this.extensions.push(createSyntaxHighlightExtension(this));
 		}
 		this.app.workspace.updateOptions();
 	}

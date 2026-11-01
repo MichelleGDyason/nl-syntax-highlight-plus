@@ -12,6 +12,9 @@
 
 import { EditorView, ViewUpdate, Decoration, DecorationSet, ViewPlugin } from "@codemirror/view";
 import nlp from "compromise";
+import { Range } from "@codemirror/state";
+import { editorInfoField } from "obsidian";
+type NLPDocument = ReturnType<typeof nlp>;
 import NLSyntaxHighlightPlugin from "main";
 
 // Helper type for Compromise offsets
@@ -52,7 +55,7 @@ const conceptualMaps: Record<string, Record<string, { className: string; label: 
     article: { label: "Fixation", className: "fixation" },
     pronoun: { label: "Subject Position", className: "subject-position" },
   },
-  geontology: {
+  geontological: {
     noun: { label: "Entity", className: "entity" },
     verb: { label: "Endurance", className: "endurance" },
     adjective: { label: "Vitality", className: "vitality" },
@@ -115,7 +118,7 @@ function isAuxiliaryTerm(match: WordOffset | undefined): boolean {
     ].includes(normal);
 }
 
-function getContextualNounCorrections(doc: any): { nouns: WordOffset[]; suppressedVerbSpans: Set<string> } {
+function getContextualNounCorrections(doc: NLPDocument): { nouns: WordOffset[]; suppressedVerbSpans: Set<string> } {
     const corrections = {
         nouns: [] as WordOffset[],
         suppressedVerbSpans: new Set<string>(),
@@ -186,18 +189,18 @@ function trimObjectChunk(match: WordOffset): WordOffset {
     };
 }
 
-function getSyntacticRoleMatches(doc: any, correctedNounSpanKeys: Set<string>): { subject: WordOffset[]; object: WordOffset[] } {
+function getSyntacticRoleMatches(doc: NLPDocument, correctedNounSpanKeys: Set<string>): { subject: WordOffset[]; object: WordOffset[] } {
     const roles: { subject: WordOffset[]; object: WordOffset[] } = {
         subject: [],
         object: [],
     };
 
-    const sentences = doc.sentences() as any;
+    const sentences = doc.sentences();
     if (!sentences?.forEach) {
         return roles;
     }
 
-    sentences.forEach((sentence: any) => {
+    sentences.forEach((sentence: NLPDocument) => {
         const chunkOffsets = sentence.chunks().out("offset") as WordOffset[];
         if (!Array.isArray(chunkOffsets) || chunkOffsets.length === 0) {
             return;
@@ -234,15 +237,24 @@ function getSyntacticRoleMatches(doc: any, correctedNounSpanKeys: Set<string>): 
 }
 
 // Get all decorations in the currently visible lines
-function getAllDecosByLine(view: EditorView): { [lineNumber: number]: DecorationSpec[] } {
+function getAllDecosByLine(view: EditorView, plugin: NLSyntaxHighlightPlugin): { [lineNumber: number]: DecorationSpec[] } {
     const widgets: { [lineNumber: number]: DecorationSpec[] } = {};
+    const scope = plugin.settings.classToApplyHighlightingTo.trim();
+    if (scope) {
+        const file = view.state.field(editorInfoField, false)?.file;
+        const frontmatter = file ? plugin.app.metadataCache.getFileCache(file)?.frontmatter : undefined;
+        const raw: unknown = frontmatter?.cssclasses ?? frontmatter?.cssclass;
+        const classes = typeof raw === "string" ? raw.split(/[\s,]+/) :
+            Array.isArray(raw) ? raw.filter((value: unknown): value is string => typeof value === "string") : [];
+        if (!classes.includes(scope)) return widgets;
+    }
 
     for (const visibleRange of view.visibleRanges) {
         const startLine = view.state.doc.lineAt(visibleRange.from).number;
         const endLine = view.state.doc.lineAt(visibleRange.to).number;
 
         for (let i = startLine; i <= endLine; i++) {
-            widgets[i] = getDecosOnLine(view, i);
+            widgets[i] = getDecosOnLine(view, i, plugin);
         }
     }
 
@@ -250,7 +262,7 @@ function getAllDecosByLine(view: EditorView): { [lineNumber: number]: Decoration
 }
 
 // Get decorations for a single line
-function getDecosOnLine(view: EditorView, lineNumber: number): DecorationSpec[] {
+function getDecosOnLine(view: EditorView, lineNumber: number, plugin: NLSyntaxHighlightPlugin): DecorationSpec[] {
     const widgets: DecorationSpec[] = [];
 
     const line = view.state.doc.line(lineNumber);
@@ -262,12 +274,10 @@ function getDecosOnLine(view: EditorView, lineNumber: number): DecorationSpec[] 
     const correctedNounSpanKeys = new Set(contextualCorrections.nouns.map(getSpanKey));
     const roleMatches = getSyntacticRoleMatches(doc, correctedNounSpanKeys);
 
-    // Get plugin instance safely
-    // @ts-ignore: Obsidian's App typing does not have plugins
-    const plugin = window.app.plugins.plugins['nl-syntax-highlight-plus'] as NLSyntaxHighlightPlugin;
+
 
     // Map POS to their matches
-    const wordsToHighlight: { [pos: string]: any } = {
+    const wordsToHighlight: { [pos: string]: { out(format: "offset"): unknown } | WordOffset[] } = {
         // Adjectives include numerals and quantity descriptors
         adjective: doc.adjectives()
             .concat(doc.match("#Value"))
@@ -319,7 +329,7 @@ function getDecosOnLine(view: EditorView, lineNumber: number): DecorationSpec[] 
     for (const partOfSpeech of Object.keys(wordsToHighlight)) {
         const words = wordsToHighlight[partOfSpeech];
         const matches = Array.isArray(words)
-            ? words as WordOffset[]
+            ? words
             : words.out("offset") as WordOffset[];
 
         // Iterate offsets
@@ -347,30 +357,24 @@ function getDecosOnLine(view: EditorView, lineNumber: number): DecorationSpec[] 
 // Convert decorations by line to CodeMirror DecorationSet
 function decosByLineToDecorationSet(
     view: EditorView,
-    decorationsByLine: { [lineNumber: number]: DecorationSpec[] }
+    decorationsByLine: { [lineNumber: number]: DecorationSpec[] },
+    plugin: NLSyntaxHighlightPlugin
 ): DecorationSet {
     // FIX: Use Range<Decoration>[] instead of Decoration[]
-    const allWidgets: any[] = [];
+    const allWidgets: Range<Decoration>[] = [];
 
     for (const lineNumberStr of Object.keys(decorationsByLine)) {
         const lineNumber = parseInt(lineNumberStr);
         const widgets = decorationsByLine[lineNumber];
         const lineStart = view.state.doc.line(lineNumber).from;
-        // Determine class based on interpretive mode
-        // @ts-ignore: Obsidian's App typing does not have plugins
-        const plugin = window.app.plugins.plugins['nl-syntax-highlight-plus'] as NLSyntaxHighlightPlugin;
-        const settingsAny = plugin.settings as any;
-        const mode =
-            typeof settingsAny.interpretiveMode === "string"
-                ? settingsAny.interpretiveMode
-                : "grammar";
-        const offsetWidgets: any[] = widgets.map(decoSpec => {
+        const mode = plugin.settings.interpretiveMode;
+        const offsetWidgets: Range<Decoration>[] = widgets.map(decoSpec => {
             const classOverride =
                 conceptualMaps[mode]?.[decoSpec.partOfSpeech]?.className || decoSpec.partOfSpeech;
             return Decoration.mark({
                 inclusive: true,
                 attributes: {},
-                class: classOverride,
+                class: `nlsh-token ${decoSpec.partOfSpeech} ${classOverride}`,
             }).range(decoSpec.start + lineStart, decoSpec.end + lineStart);
         });
         allWidgets.push(...offsetWidgets);
@@ -380,20 +384,23 @@ function decosByLineToDecorationSet(
 }
 
 // The main plugin
-export const NLSyntaxHighlightViewPlugin = ViewPlugin.fromClass(
+export function createSyntaxHighlightExtension(plugin: NLSyntaxHighlightPlugin) {
+return ViewPlugin.fromClass(
     class {
         decorations: DecorationSet;
         decorationsByLine: { [lineNumber: number]: DecorationSpec[] };
 
         constructor(view: EditorView) {
-            this.decorationsByLine = getAllDecosByLine(view);
-            this.decorations = decosByLineToDecorationSet(view, this.decorationsByLine);
+            this.decorationsByLine = getAllDecosByLine(view, plugin);
+            this.decorations = decosByLineToDecorationSet(view, this.decorationsByLine, plugin);
         }
 
         update(update: ViewUpdate) {
             let shouldRegenerateAllDecorations = false;
 
-            if (update.docChanged) {
+            if (plugin.settings.classToApplyHighlightingTo.trim()) {
+                shouldRegenerateAllDecorations = update.docChanged || update.viewportChanged;
+            } else if (update.docChanged) {
                 if (update.startState.doc.lines === update.state.doc.lines) {
                     let changeCount = 0;
                     let lineChangedNumber = 0;
@@ -408,7 +415,7 @@ export const NLSyntaxHighlightViewPlugin = ViewPlugin.fromClass(
                     });
 
                     if (singleCharacterInserted) {
-                        this.decorationsByLine[lineChangedNumber] = getDecosOnLine(update.view, lineChangedNumber);
+                        this.decorationsByLine[lineChangedNumber] = getDecosOnLine(update.view, lineChangedNumber, plugin);
                     } else {
                         shouldRegenerateAllDecorations = true;
                     }
@@ -420,10 +427,12 @@ export const NLSyntaxHighlightViewPlugin = ViewPlugin.fromClass(
             }
 
             if (shouldRegenerateAllDecorations)
-                this.decorationsByLine = getAllDecosByLine(update.view);
+                this.decorationsByLine = getAllDecosByLine(update.view, plugin);
 
-            this.decorations = decosByLineToDecorationSet(update.view, this.decorationsByLine);
+            this.decorations = decosByLineToDecorationSet(update.view, this.decorationsByLine, plugin);
         }
     },
     { decorations: v => v.decorations }
 );
+
+}

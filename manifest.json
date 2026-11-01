@@ -1,7 +1,7 @@
 {
 	"id": "nl-syntax-highlight-plus",
 	"name": "Natural Language Syntax Highlight Plus",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"minAppVersion": "0.15.0",
 	"description": "Highlight parts of speech and sentence roles, with playful interpretive modes inspired by philosophy.",
 	"author": "MichelleGDyason",

@@ -18,7 +18,7 @@
     --pos-verb-hue: 220;       /* blue / action */
     --pos-adjective-hue: 16;   /* peach / quality */
     --pos-adverb-hue: 285;     /* violet / modulation */
-  
+
     /* Relational / structural */
     --pos-pronoun-hue: 270;    /* purple / substitution */
     --pos-article-hue: 35;     /* muted orange / definiteness */
@@ -26,48 +26,48 @@
     --pos-conjunction-hue: 250;/* indigo / linkage */
     --pos-subject-hue: 145;    /* green / agent */
     --pos-object-hue: 18;      /* dirt-brown / target */
-  
+
     /* Higher-order */
     --pos-predicate-hue: 2;    /* gloss red / assertion */
   }
 
 /* ---------- CHANNEL SEPARATION ---------- */
 
-.article {
+.nlsh-token.article {
   opacity: 0.55;
 }
 
-.pronoun {
+.nlsh-token.pronoun {
   opacity: 0.65;
 }
 
-.adverb {
-  font-style: normal !important;
+.nlsh-token.adverb {
+  font-style: normal;
 }
 
-.article,
-.pronoun,
-.determiner {
-  font-style: normal !important;
+.nlsh-token.article,
+.nlsh-token.pronoun,
+.nlsh-token.determiner {
+  font-style: normal;
 }
 
-.preposition {
+.nlsh-token.preposition {
   opacity: 1;
 }
 
-.conjunction {
+.nlsh-token.conjunction {
   background: none;
   opacity: 1;
 }
 
-.predicate {
+.nlsh-token.predicate {
   background-image: linear-gradient(hsla(var(--pos-predicate-hue), 100%, 54%, 0.97), hsla(var(--pos-predicate-hue), 100%, 54%, 0.97));
   background-repeat: no-repeat;
   background-size: 100% 2px;
   background-position: 0 100%;
 }
 
-.subject {
+.nlsh-token.subject {
   color: inherit;
   background-image: linear-gradient(hsla(var(--pos-subject-hue), 100%, 62%, 0.95), hsla(var(--pos-subject-hue), 100%, 62%, 0.95));
   background-repeat: no-repeat;
@@ -75,7 +75,7 @@
   background-position: 0 calc(100% - 3px);
 }
 
-.object {
+.nlsh-token.object {
   color: inherit;
   background-image: linear-gradient(hsla(var(--pos-object-hue), 54%, 29%, 0.95), hsla(var(--pos-object-hue), 54%, 29%, 0.95));
   background-repeat: no-repeat;
@@ -83,11 +83,11 @@
   background-position: 0 calc(100% - 3px);
 }
 
-.adverb,
-.preposition,
-.conjunction {
-  background: none !important;
-  text-decoration: none !important;
+.nlsh-token.adverb,
+.nlsh-token.preposition,
+.nlsh-token.conjunction {
+  background: none;
+  text-decoration: none;
 }
 
 /* ========================================= */
@@ -114,27 +114,27 @@
     --pos-light-object: 50%;
     --pos-light-predicate: 60%;
   }
-  
-  .nlsh-theme-minimal .noun { color: var(--pos-noun-color); }
-  .nlsh-theme-minimal .verb { color: var(--pos-verb-color); }
-  .nlsh-theme-minimal .adjective { color: var(--pos-adjective-color); }
-  .nlsh-theme-minimal .adverb { color: var(--pos-adverb-color); }
-  .nlsh-theme-minimal .pronoun { color: var(--pos-pronoun-color); }
-  .nlsh-theme-minimal .article { color: var(--pos-article-color); }
-  .nlsh-theme-minimal .preposition { color: var(--pos-preposition-color); }
-.nlsh-theme-minimal .conjunction { 
+
+  .nlsh-theme-minimal .nlsh-token.noun { color: var(--pos-noun-color); }
+  .nlsh-theme-minimal .nlsh-token.verb { color: var(--pos-verb-color); }
+  .nlsh-theme-minimal .nlsh-token.adjective { color: var(--pos-adjective-color); }
+  .nlsh-theme-minimal .nlsh-token.adverb { color: var(--pos-adverb-color); }
+  .nlsh-theme-minimal .nlsh-token.pronoun { color: var(--pos-pronoun-color); }
+  .nlsh-theme-minimal .nlsh-token.article { color: var(--pos-article-color); }
+  .nlsh-theme-minimal .nlsh-token.preposition { color: var(--pos-preposition-color); }
+.nlsh-theme-minimal .nlsh-token.conjunction {
     color: var(--pos-conjunction-color); 
   }
-.nlsh-theme-minimal .subject {
+.nlsh-theme-minimal .nlsh-token.subject {
   background-image: linear-gradient(hsla(var(--pos-subject-hue), calc(var(--pos-sat) + 25%), calc(var(--pos-light-subject) - 6%), 0.95), hsla(var(--pos-subject-hue), calc(var(--pos-sat) + 25%), calc(var(--pos-light-subject) - 6%), 0.95));
 }
-.nlsh-theme-minimal .object {
+.nlsh-theme-minimal .nlsh-token.object {
   background-image: linear-gradient(hsla(var(--pos-object-hue), 54%, 29%, 0.95), hsla(var(--pos-object-hue), 54%, 29%, 0.95));
 }
-.nlsh-theme-minimal .predicate {
+.nlsh-theme-minimal .nlsh-token.predicate {
   background-image: linear-gradient(hsla(var(--pos-predicate-hue), 96%, 54%, 0.97), hsla(var(--pos-predicate-hue), 96%, 54%, 0.97));
 }
-  
+
   /* ---------- HIGH CONTRAST ---------- */
   .nlsh-theme-high-contrast {
     --pos-sat: 100%;
@@ -150,27 +150,27 @@
     --pos-light-object: 46%;
     --pos-light-predicate: 58%;
   }
-  
-  .nlsh-theme-high-contrast .noun { color: var(--pos-noun-color); }
-  .nlsh-theme-high-contrast .verb { color: var(--pos-verb-color); }
-  .nlsh-theme-high-contrast .adjective { color: var(--pos-adjective-color); }
-  .nlsh-theme-high-contrast .adverb { color: var(--pos-adverb-color); }
-  .nlsh-theme-high-contrast .pronoun { color: var(--pos-pronoun-color); }
-  .nlsh-theme-high-contrast .article { color: var(--pos-article-color); }
-  .nlsh-theme-high-contrast .preposition { color: var(--pos-preposition-color); }
-.nlsh-theme-high-contrast .conjunction { 
+
+  .nlsh-theme-high-contrast .nlsh-token.noun { color: var(--pos-noun-color); }
+  .nlsh-theme-high-contrast .nlsh-token.verb { color: var(--pos-verb-color); }
+  .nlsh-theme-high-contrast .nlsh-token.adjective { color: var(--pos-adjective-color); }
+  .nlsh-theme-high-contrast .nlsh-token.adverb { color: var(--pos-adverb-color); }
+  .nlsh-theme-high-contrast .nlsh-token.pronoun { color: var(--pos-pronoun-color); }
+  .nlsh-theme-high-contrast .nlsh-token.article { color: var(--pos-article-color); }
+  .nlsh-theme-high-contrast .nlsh-token.preposition { color: var(--pos-preposition-color); }
+.nlsh-theme-high-contrast .nlsh-token.conjunction {
     color: var(--pos-conjunction-color); 
   }
-.nlsh-theme-high-contrast .subject {
+.nlsh-theme-high-contrast .nlsh-token.subject {
   background-image: linear-gradient(hsla(var(--pos-subject-hue), 100%, 66%, 1), hsla(var(--pos-subject-hue), 100%, 66%, 1));
 }
-.nlsh-theme-high-contrast .object {
+.nlsh-theme-high-contrast .nlsh-token.object {
   background-image: linear-gradient(hsla(var(--pos-object-hue), 60%, 31%, 0.98), hsla(var(--pos-object-hue), 60%, 31%, 0.98));
 }
-.nlsh-theme-high-contrast .predicate {
+.nlsh-theme-high-contrast .nlsh-token.predicate {
   background-image: linear-gradient(hsla(var(--pos-predicate-hue), 100%, 56%, 1), hsla(var(--pos-predicate-hue), 100%, 56%, 1));
 }
-  
+
   /* ---------- TEACHING ---------- */
   .nlsh-theme-teaching {
     --pos-sat: 70%;
@@ -186,22 +186,22 @@
     --pos-light-object: 58%;
     --pos-light-predicate: 62%;
   }
-  
-  .nlsh-theme-teaching .noun { background-color: color-mix(in srgb, var(--pos-noun-color) 25%, transparent); }
-  .nlsh-theme-teaching .verb { background-color: color-mix(in srgb, var(--pos-verb-color) 25%, transparent); }
-  .nlsh-theme-teaching .adjective { background-color: color-mix(in srgb, var(--pos-adjective-color) 25%, transparent); }
-  .nlsh-theme-teaching .adverb { background-color: color-mix(in srgb, var(--pos-adverb-color) 25%, transparent); }
-  .nlsh-theme-teaching .pronoun { background-color: color-mix(in srgb, var(--pos-pronoun-color) 25%, transparent); }
-  .nlsh-theme-teaching .article { background-color: color-mix(in srgb, var(--pos-article-color) 25%, transparent); }
-  .nlsh-theme-teaching .preposition { background-color: color-mix(in srgb, var(--pos-preposition-color) 25%, transparent); }
-  .nlsh-theme-teaching .conjunction { background-color: color-mix(in srgb, var(--pos-conjunction-color) 25%, transparent); }
-.nlsh-theme-teaching .subject {
+
+  .nlsh-theme-teaching .nlsh-token.noun { background-color: color-mix(in srgb, var(--pos-noun-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.verb { background-color: color-mix(in srgb, var(--pos-verb-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.adjective { background-color: color-mix(in srgb, var(--pos-adjective-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.adverb { background-color: color-mix(in srgb, var(--pos-adverb-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.pronoun { background-color: color-mix(in srgb, var(--pos-pronoun-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.article { background-color: color-mix(in srgb, var(--pos-article-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.preposition { background-color: color-mix(in srgb, var(--pos-preposition-color) 25%, transparent); }
+  .nlsh-theme-teaching .nlsh-token.conjunction { background-color: color-mix(in srgb, var(--pos-conjunction-color) 25%, transparent); }
+.nlsh-theme-teaching .nlsh-token.subject {
   background-image: linear-gradient(hsla(var(--pos-subject-hue), calc(var(--pos-sat) + 20%), calc(var(--pos-light-subject) - 6%), 0.96), hsla(var(--pos-subject-hue), calc(var(--pos-sat) + 20%), calc(var(--pos-light-subject) - 6%), 0.96));
 }
-.nlsh-theme-teaching .object {
+.nlsh-theme-teaching .nlsh-token.object {
   background-image: linear-gradient(hsla(var(--pos-object-hue), 52%, 31%, 0.96), hsla(var(--pos-object-hue), 52%, 31%, 0.96));
 }
-  .nlsh-theme-teaching .predicate { background-image: linear-gradient(hsla(var(--pos-predicate-hue), 92%, 55%, 0.97), hsla(var(--pos-predicate-hue), 92%, 55%, 0.97)); }
+  .nlsh-theme-teaching .nlsh-token.predicate { background-image: linear-gradient(hsla(var(--pos-predicate-hue), 92%, 55%, 0.97), hsla(var(--pos-predicate-hue), 92%, 55%, 0.97)); }
 
   /* ========================================= */
 /* POS LEGEND / KEY                          */
@@ -214,13 +214,13 @@
     font-size: 0.85em;
     margin: 0.75rem 0;
   }
-  
+
   .nlsh-legend-item {
     display: flex;
     align-items: center;
     gap: 0.4rem;
   }
-  
+
 .nlsh-legend-swatch {
   width: 1.2rem;
   height: 1.2rem;
@@ -305,7 +305,7 @@
   height: 0.9rem;
 }
 
-  
+
   .nlsh-legend-container {
     margin-top: 0.75rem;
     margin-bottom: 1rem;
@@ -323,7 +323,7 @@
 
 /* --- Base inheritance rule --- */
 /* Conceptual classes NEVER define color directly */
-.conceptual {
+.nlsh-token.conceptual {
   color: inherit;
   background: inherit;
   text-decoration: inherit;
@@ -336,14 +336,8 @@
 
 /* Determination:
    articles, quantifiers, "one", "some", "how", "so" */
-.determiner {
+.nlsh-token.determiner {
   opacity: 0.55;
-}
-
-/* Modification:
-   adjectives + adverbs as a conceptual group */
-.modifier {
-  text-decoration-thickness: 1.5px;
 }
 
 /* ========================================= */
@@ -352,14 +346,8 @@
 
 /* Becoming:
    verbs, adverbs, predicates */
-.becoming {
+.nlsh-token.becoming {
   filter: saturate(1.15);
-}
-
-/* Intensity:
-   adverbs, predicates */
-.intensity {
-  text-decoration-thickness: 2px;
 }
 
 /* ========================================= */
@@ -368,14 +356,8 @@
 
 /* Relation:
    prepositions + conjunctions */
-.relation {
+.nlsh-token.relation {
   opacity: 0.8;
-}
-
-/* Articulation:
-   conjunctions as discursive joints */
-.articulation {
-  text-decoration-style: dotted;
 }
 
 /* ========================================= */
@@ -384,13 +366,15 @@
 
 /* Event / Assertion:
    predicates as event-fields */
-.event {
+.nlsh-token.event {
   background-color: hsla(var(--pos-predicate-hue), 80%, 60%, 0.3);
   outline: 1.5px dashed hsla(var(--pos-predicate-hue), 80%, 60%, 0.9);
 }
 
 /* Objecthood / Materiality:
    nouns as persistent entities */
-.discursive-object {
+.nlsh-token.discursive-object {
   font-weight: 500;
 }
+
+.nlsh-setting-name { display: flex; align-items: center; gap: 0.5rem; }
